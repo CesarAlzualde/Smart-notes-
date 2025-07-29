@@ -1,0 +1,299 @@
+/* NotesFilterBar Moderno */
+
+.filter-container {
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+/* Estilo para el formulario de búsqueda */
+.search-form {
+  width: 100%;
+}
+
+/* Grupo de búsqueda principal */
+.search-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  height: 48px;
+  padding-left: 3rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+  border-color: #3f51b5;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Filtros avanzados */
+.advanced-filters {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.filter-section {
+  margin-bottom: 1rem;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.filter-select {
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+/* Estilos para grupos de botones y checkboxes modernos */
+.button-group,
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.filter-checkbox,
+.filter-button-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+  padding: 0.5rem 1rem;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  color: #475569;
+}
+
+.filter-checkbox:hover,
+.filter-button-group label:hover {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.filter-checkbox input:checked + i,
+.filter-checkbox input:checked + span,
+.filter-button-group input:checked + label {
+  background-color: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+/* Específico para los botones de radio (Vista, Navegación) */
+.filter-button-group input[type="radio"]:checked + label {
+  background-color: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.filter-checkbox.active {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+
+.filter-checkbox input,
+.filter-button-group input {
+  display: none;
+}
+
+.filter-checkbox i,
+.filter-button-group label i {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Grupos de controles */
+.control-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Controles de vista */
+.view-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.view-button {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-button:hover {
+  background-color: #f8f9fc;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+}
+
+.view-button.active {
+  background-color: #f0f2ff;
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+/* Controles de navegación/scroll */
+.scroll-controls {
+  margin-top: 8px;
+}
+
+.scroll-mode-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.scroll-button {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem; /* Ajustado para que coincida con otros botones */
+}
+
+.scroll-button:hover {
+  background-color: #f8f9fc;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+}
+
+.scroll-button.active {
+  background-color: #f0f2ff;
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+/* Botones de acción */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.clear-button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: white;
+  color: #666;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-button:hover {
+  background-color: #f8f9fa;
+}
+
+.filter-button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  background-image: linear-gradient(135deg, #3f51b5, #536dfe);
+  color: white;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(83, 109, 254, 0.2);
+}
+
+/* Para expandir/contraer los filtros */
+.filter-collapse {
+  transition: all 0.3s ease;
+}
+
+/* Animaciones para los iconos toggle */
+.filter-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.filter-toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
+/* Espaciado para los filtros de fecha personalizada */
+.custom-date-range {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 1rem;
+}
+
+/* Estilo para botones activos en la selección de vista */
+.btn-outline-primary.active {
+  background-color: #6c5ce7;
+  color: white;
+  border-color: #6c5ce7;
+}
+
+/* Estilo para iconos en los inputs */
+.form-control-icon {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  pointer-events: none;
+  color: #aaa;
+}
+
+/* Animación para transiciones suaves */
+.advanced-filters {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

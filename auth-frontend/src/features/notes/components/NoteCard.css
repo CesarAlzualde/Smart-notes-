@@ -1,0 +1,304 @@
+/* Estilos para tarjetas de notas - Versión moderna */
+.note-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.note-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Encabezado de la tarjeta */
+.note-header {
+  padding: 16px;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.note-header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0; /* Para que funcione text-overflow */
+}
+
+.note-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1a2b45; /* Azul oscuro para el título */
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+  max-width: calc(100% - 10px);
+}
+
+/* Badge para temas */
+.topic-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: 50px;
+  color: white;
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Cuerpo de la tarjeta */
+.note-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Enlace para toda el área de contenido */
+.note-content-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+}
+
+.note-content-link:hover {
+  color: inherit;
+}
+
+/* Resumen de la nota con truncado de texto */
+.note-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  position: relative;
+  line-height: 1.5;
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+/* Soporte para navegadores sin -webkit-line-clamp */
+@supports not (-webkit-line-clamp: 3) {
+  .note-summary {
+    max-height: 4.5em; /* 3 líneas x 1.5em */
+  }
+  
+  .note-summary::after {
+    content: "...";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, transparent, white 50%);
+    padding-left: 40px;
+  }
+}
+
+/* Miniatura de imagen */
+.note-thumbnail {
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+/* Etiquetas */
+.note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.tag-badge {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  border-radius: 50px;
+  padding: 0.25rem 0.7rem;
+  display: inline-block;
+  font-weight: 500;
+}
+
+/* Pie de la tarjeta */
+.note-footer {
+  background-color: #f9fafb;
+  border-top: 1px solid #f1f1f1;
+  padding: 12px 16px;
+}
+
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.note-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note-meta i {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* Botones de acción */
+.note-actions {
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+  position: relative;
+}
+
+.action-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.view-button:hover {
+  color: #3b82f6;
+}
+
+.edit-button:hover {
+  color: #f59e0b;
+}
+
+.delete-button:hover {
+  color: #ef4444;
+}
+
+/* Estilos específicos para vista de lista */
+.note-card.list-view-card {
+  flex-direction: row;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.list-view-card .note-header {
+  width: 25%;
+  border-right: 1px solid #f1f1f1;
+  border-bottom: none;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.list-view-card .note-header-content {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.list-view-card .note-actions {
+  align-self: flex-end;
+  margin-top: 8px;
+}
+
+.list-view-card .note-content-link {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.list-view-card .note-body {
+  width: 60%;
+  flex-shrink: 1;
+}
+
+.list-view-card .note-footer {
+  width: 15%;
+  border-left: 1px solid #f1f1f1;
+  border-top: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.list-view-card .note-meta {
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.list-view-card .note-thumbnail {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  margin-right: 16px;
+  margin-bottom: 0;
+  align-self: center;
+}
+
+/* Adaptación responsive para la vista de lista */
+@media (max-width: 768px) {
+  .note-card.list-view-card {
+    flex-direction: column;
+  }
+  
+  .list-view-card .note-header,
+  .list-view-card .note-footer {
+    width: 100%;
+    border-right: none;
+    border-left: none;
+  }
+  
+  .list-view-card .note-header {
+    border-bottom: 1px solid #f1f1f1;
+  }
+  
+  .list-view-card .note-content-link {
+    flex-direction: column;
+  }
+  
+  .list-view-card .note-body {
+    width: 100%;
+  }
+  
+  .list-view-card .note-footer {
+    border-top: 1px solid #f1f1f1;
+  }
+  
+  .list-view-card .note-thumbnail {
+    width: 100%;
+    height: 120px;
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "apuntes-2.0",
+  "version": "1.0.0",
+  "description": "Sistema de Notas con IA y Análisis Avanzado",
+  "type": "module",
+  "main": "start-apuntes.js",
+  "scripts": {
+    "start": "node start-apuntes.js",
+    "launcher": "🚀 Iniciar Apuntes 2.0.bat"
+  },
+  "keywords": ["ai", "notes", "electron", "flask", "ocr"],
+  "author": "Apuntes 2.0 Team",
+  "license": "MIT"
+}

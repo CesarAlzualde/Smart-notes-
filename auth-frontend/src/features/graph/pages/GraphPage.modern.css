@@ -1,0 +1,267 @@
+/* GraphPage: Estilos modernos */
+
+.graph-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 60px); /* Altura total menos el navbar */
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+/* Estilos para el estado de carga */
+.graph-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 60px);
+  width: 100%;
+  color: #334155;
+}
+
+.graph-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: graph-spin 1s linear infinite;
+}
+
+@keyframes graph-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.graph-loading p {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+}
+
+/* Estilos para mensajes de error */
+.graph-error {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 2rem;
+}
+
+.graph-error-alert {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  color: #b91c1c;
+}
+
+.graph-error-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #991b1b;
+}
+
+.graph-error-message {
+  margin-bottom: 1rem;
+}
+
+.graph-error-divider {
+  height: 1px;
+  background-color: #fecaca;
+  margin: 1rem 0;
+}
+
+.graph-error-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.graph-error-button:hover {
+  background-color: #fee2e2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+/* Controles del grafo */
+.graph-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.graph-control-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  gap: 0.375rem;
+}
+
+.graph-control-button:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #3b82f6;
+}
+
+.graph-control-button.primary {
+  border-color: #cbd5e1;
+}
+
+.graph-control-button.secondary {
+  border-color: #cbd5e1;
+}
+
+/* Tooltips para nodos y enlaces */
+.node-tooltip, .link-tooltip {
+  position: absolute;
+  padding: 0.75rem 1rem;
+  background-color: rgba(15, 23, 42, 0.85);
+  color: white;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: 100;
+  min-width: 120px;
+  max-width: 250px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translate3d(0, 0, 0);
+  animation: tooltip-fade-in 0.2s ease-out;
+}
+
+.node-tooltip {
+  border-left: 3px solid #3b82f6;
+}
+
+.link-tooltip {
+  border-left: 3px solid #10b981;
+}
+
+.node-tooltip strong, .link-tooltip strong {
+  display: block;
+  font-size: 0.8125rem;
+  margin-bottom: 0.25rem;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.node-tooltip div, .link-tooltip div {
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efectos de nodos y animaciones */
+.node-pulse {
+  animation: node-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes node-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Estilos para selección de nodo */
+.node-selected {
+  stroke: #3b82f6;
+  stroke-width: 2px;
+  stroke-dasharray: 5;
+  animation: selected-pulse 2s infinite linear;
+}
+
+@keyframes selected-pulse {
+  0% {
+    stroke-width: 2px;
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-width: 3px;
+    stroke-opacity: 0.8;
+  }
+  100% {
+    stroke-width: 2px;
+    stroke-opacity: 1;
+  }
+}
+
+/* Efecto de partículas en enlaces */
+.particle {
+  fill: #3b82f6;
+  opacity: 0.8;
+}
+
+/* Canvas overlay para efectos interactivos */
+.graph-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .graph-controls {
+    top: auto;
+    bottom: 4.5rem;
+    right: 0.75rem;
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+  
+  .graph-control-button {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}

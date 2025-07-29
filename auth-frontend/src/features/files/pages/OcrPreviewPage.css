@@ -1,0 +1,75 @@
+.ocr-result-container {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.ocr-text {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.ocr-thumbnail {
+  max-height: 300px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.confidence-badge {
+  font-size: 0.8rem;
+}
+
+/* Mejorar la experiencia de carga con una animación suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card, .alert {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Estilo para cuando el texto está seleccionado */
+.ocr-text::selection {
+  background-color: rgba(13, 110, 253, 0.25);
+}
+
+/* Mejora de la apariencia del input */
+#note-title:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #80bdff;
+}
+
+/* Estilos para el spinner centrado */
+.ocr-loading-container {
+  min-height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para etiquetas */
+.tag-badge {
+  cursor: pointer;
+}
+
+.tag-remove-btn {
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ocr-result-container {
+    max-height: 50vh;
+  }
+}

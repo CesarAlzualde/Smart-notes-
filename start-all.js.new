@@ -1,0 +1,60 @@
+// Script para iniciar todos los servicios de la aplicación
+const concurrently = require('concurrently');
+const path = require('path');
+const { execSync } = require('child_process');
+
+// Configurar rutas
+const rootDir = __dirname;
+const backendDir = path.join(rootDir, 'backend');
+const frontendDir = path.join(rootDir, 'auth-frontend');
+const credentialsPath = path.join(rootDir, 'credentials', 'google-vision-key.json');
+
+// Configurar variable de entorno para Google Vision
+try {
+  console.log('Configurando variable de entorno GOOGLE_APPLICATION_CREDENTIALS...');
+  execSync(`powershell -Command "$env:GOOGLE_APPLICATION_CREDENTIALS='${credentialsPath.replace(/\\/g, '\\\\')}'"`);
+  console.log(`Variable de entorno configurada: ${credentialsPath}`);
+} catch (envError) {
+  console.error('Error al configurar variable de entorno:', envError);
+}
+
+console.log('Iniciando servicios desde:', rootDir);
+console.log('- Backend:', backendDir);
+console.log('- Frontend:', frontendDir);
+
+// Iniciar todos los servicios
+try {
+  // En Windows, necesitamos ejecutar comandos a través de cmd.exe para activar el entorno virtual
+  const { result } = concurrently([
+    { 
+      command: 'cmd /c "..\\\.venv\\Scripts\\activate && python run.py"', 
+      name: 'Backend', 
+      cwd: backendDir,
+      prefixColor: 'blue',
+    },
+    { 
+      command: 'cmd /c "..\\\.venv\\Scripts\\activate && celery -A app.celery_app.celery worker --loglevel=info"', 
+      name: 'Celery', 
+      cwd: backendDir,
+      prefixColor: 'green',
+    },
+    { 
+      command: 'npm run dev', 
+      name: 'Frontend', 
+      cwd: frontendDir,
+      prefixColor: 'magenta',
+    }
+  ], {
+    prefix: 'name',
+    killOthersOnFail: true,  // Reemplaza killOthers: ['failure']
+    restartTries: 3,
+  });
+
+  // Manejar la finalización
+  result.then(
+    () => console.log('Todos los servicios iniciados con éxito.'),
+    (err) => console.error('Uno de los servicios ha fallado:', err)
+  );
+} catch (error) {
+  console.error('Error al iniciar los servicios:', error);
+}

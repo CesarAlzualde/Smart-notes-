@@ -1,0 +1,431 @@
+"""
+Servicio para procesamiento OCR (Reconocimiento Óptico de Caracteres).
+Permite extraer texto de imágenes y documentos PDF utilizando:
+1. Tesseract OCR (implementación básica)
+2. Google Vision OCR (implementación avanzada, requiere credenciales API)
+
+Este módulo unifica las interfaces de ambos motores OCR y proporciona
+un servicio integrado para la aplicación con manejo de fallos y alternativas.
+"""
+
+import os
+import logging
+import tempfile
+import re
+from typing import List, Optional
+from PIL import Image
+import pytesseract
+import pdf2image
+import io
+import numpy as np
+
+# Importaciones para Google Vision OCR
+try:
+    from google.cloud import vision
+    from google.oauth2 import service_account
+    GOOGLE_VISION_AVAILABLE = True
+except ImportError:
+    GOOGLE_VISION_AVAILABLE = False
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Ruta por defecto para las credenciales de Google Vision (ajustada para la nueva estructura)
+DEFAULT_CREDENTIALS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
+    "config", 
+    "google-vision-key.json"
+)
+
+class OCRProcessor:
+    """
+    Procesador OCR para extraer texto de imágenes y documentos PDF.
+    
+    Utiliza Tesseract OCR para imágenes y pdf2image + Tesseract para PDFs.
+    """
+    
+    def __init__(self, lang="spa"):
+        """
+        Inicializa el procesador OCR.
+        
+        Args:
+            lang (str): Idioma para OCR (default: español)
+        """
+        self.lang = lang
+        
+        # Definir tipos de archivos soportados
+        self.supported_image_types = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.webp']
+        self.supported_types = self.supported_image_types + ['.pdf']
+        
+        # Verificar instalación de Tesseract
+        try:
+            pytesseract.get_tesseract_version()
+            logger.info("Tesseract OCR disponible")
+        except Exception as e:
+            logger.warning(f"Tesseract OCR no disponible: {e}")
+            logger.warning("Se utilizará un modo simulado para desarrollo")
+            
+    def is_supported_filetype(self, filename):
+        """
+        Verifica si el tipo de archivo es soportado.
+        
+        Args:
+            filename (str): Nombre del archivo a verificar
+            
+        Returns:
+            bool: True si es soportado, False en caso contrario
+        """
+        ext = os.path.splitext(filename.lower())[1]
+        return ext in self.supported_types
+        
+    def process_file(self, filepath):
+        """
+        Procesa un archivo y extrae su texto.
+        
+        Args:
+            filepath (str): Ruta al archivo a procesar
+            
+        Returns:
+            str: Texto extraído del archivo
+        """
+        if not os.path.exists(filepath):
+            logger.error(f"Archivo no encontrado: {filepath}")
+            return ""
+            
+        try:
+            ext = os.path.splitext(filepath.lower())[1]
+            
+            # Procesar según tipo de archivo
+            if ext == '.pdf':
+                return self._process_pdf(filepath)
+            elif ext in self.supported_image_types:
+                return self._process_image(filepath)
+            else:
+                logger.error(f"Tipo de archivo no soportado: {ext}")
+                return ""
+                
+        except Exception as e:
+            logger.error(f"Error al procesar archivo: {e}")
+            return ""
+            
+    def _process_image(self, image_path):
+        """
+        Procesa una imagen con OCR.
+        
+        Args:
+            image_path (str): Ruta a la imagen
+            
+        Returns:
+            str: Texto extraído de la imagen
+        """
+        try:
+            # Verificar si Tesseract está disponible
+            try:
+                pytesseract.get_tesseract_version()
+                # Abrir imagen con PIL
+                with Image.open(image_path) as img:
+                    # Aplicar preprocesamiento básico
+                    img = self._preprocess_image(img)
+                    
+                    # Realizar OCR
+                    text = pytesseract.image_to_string(img, lang=self.lang)
+                    
+                    return text.strip()
+            except:
+                # Modo simulado para desarrollo/pruebas
+                logger.info("Utilizando modo simulado para OCR (Tesseract no disponible)")
+                return self._simulate_ocr(image_path)
+                
+        except Exception as e:
+            logger.error(f"Error en OCR de imagen: {e}")
+            return ""
+
+    def _process_pdf(self, pdf_path):
+        """
+        Procesa un documento PDF con OCR.
+        
+        Args:
+            pdf_path (str): Ruta al PDF
+            
+        Returns:
+            str: Texto extraído del PDF
+        """
+        try:
+            try:
+                images = pdf2image.convert_from_path(
+                    pdf_path, 
+                    dpi=300,
+                    fmt="jpeg",
+                    output_folder=tempfile.gettempdir()
+                )
+                extracted_text = []
+                for i, img in enumerate(images):
+                    img = self._preprocess_image(img)
+                    text = pytesseract.image_to_string(img, lang=self.lang)
+                    extracted_text.append(text)
+                    img.close()
+                return "\n\n".join(extracted_text).strip()
+            except Exception as e:
+                logger.info(f"Error en proceso normal de PDF: {e}. Utilizando modo simulado.")
+                return self._simulate_ocr(pdf_path, is_pdf=True)
+        except Exception as e:
+            logger.error(f"Error en OCR de PDF: {e}")
+            return ""
+
+    def _preprocess_image(self, img):
+        """
+        Preprocesa una imagen para mejorar resultados OCR.
+        
+        Args:
+            img (PIL.Image): Imagen a preprocesar
+            
+        Returns:
+            PIL.Image: Imagen preprocesada
+        """
+        try:
+            if img.mode != 'L':
+                img = img.convert('L')
+            return img
+        except Exception as e:
+            logger.error(f"Error en preprocesamiento de imagen: {e}")
+            return img
+
+    def _simulate_ocr(self, file_path, is_pdf=False):
+        """
+        Simula procesamiento OCR para desarrollo cuando Tesseract no está disponible.
+        
+        Args:
+            file_path (str): Ruta al archivo
+            is_pdf (bool): Si el archivo es PDF
+            
+        Returns:
+            str: Texto simulado
+        """
+        filename = os.path.basename(file_path)
+        file_size = os.path.getsize(file_path)
+        if is_pdf:
+            return (
+                f"[OCR SIMULADO para PDF: {filename}]\n\n"
+                f"Este es un texto simulado para un documento PDF de {file_size} bytes.\n"
+                "En un entorno de producción, este texto sería extraído mediante OCR real.\n\n"
+                "El documento contiene información importante sobre el tema tratado.\n"
+                "Los puntos principales incluyen:\n"
+                "- Primer punto de información relevante\n"
+                "- Segundo punto con datos adicionales\n"
+                "- Conclusiones y recomendaciones\n\n"
+                "Para habilitar OCR real, instale Tesseract y las dependencias necesarias."
+            )
+        else:
+            return (
+                f"[OCR SIMULADO para imagen: {filename}]\n\n"
+                f"Este es un texto simulado para una imagen de {file_size} bytes.\n"
+                "En un entorno de producción, este texto sería extraído mediante OCR real.\n\n"
+                "La imagen contiene texto que sería procesado por Tesseract OCR.\n"
+                "Para habilitar OCR real, instale Tesseract y configure el path adecuadamente."
+            )
+    
+    def is_google_vision_available(self):
+        """
+        Verifica si Google Vision API está disponible y configurado correctamente.
+        
+        Returns:
+            bool: True si Google Vision está disponible, False en caso contrario
+        """
+        try:
+            # Verificar si Google Vision está instalado como librería
+            if not GOOGLE_VISION_AVAILABLE:
+                logger.info("Google Vision no está disponible: librería no instalada")
+                return False
+            
+            # Verificar rutas de credenciales
+            credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or DEFAULT_CREDENTIALS_PATH
+            
+            # Verificar si existe el archivo de credenciales
+            if not os.path.isfile(credentials_path):
+                # Buscar en "credentials" en lugar de "config"
+                # (ajuste para la estructura actual del proyecto)
+                credentials_alt = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                    "credentials", 
+                    "google-vision-key.json"
+                )
+                
+                if os.path.isfile(credentials_alt):
+                    credentials_path = credentials_alt
+                else:
+                    logger.info(f"Google Vision no está disponible: archivo de credenciales no encontrado en {credentials_path}")
+                    return False
+            
+            # Intentar inicializar cliente para verificar credenciales
+            try:
+                credentials = service_account.Credentials.from_service_account_file(credentials_path)
+                client = vision.ImageAnnotatorClient(credentials=credentials)
+                logger.info("Google Vision disponible y configurado correctamente")
+                return True
+            except Exception as e:
+                logger.error(f"Error al inicializar cliente Google Vision: {e}")
+                return False
+            
+        except Exception as e:
+            logger.error(f"Error al verificar disponibilidad de Google Vision: {e}")
+            return False
+
+    def generate_thumbnail(self, image_path, size=(200, 200)):
+        """
+        Genera una miniatura para una imagen.
+        
+        Args:
+            image_path (str): Ruta a la imagen
+            size (tuple): Tamaño de la miniatura (ancho, alto)
+            
+        Returns:
+            str: Ruta a la miniatura generada o None si falla
+        """
+        try:
+            # Verificar que la imagen existe
+            if not os.path.exists(image_path):
+                logger.error(f"No se puede generar miniatura - imagen no encontrada: {image_path}")
+                return None
+                
+            # Crear directorio de miniaturas si no existe
+            thumbnails_dir = os.path.join(os.path.dirname(image_path), "thumbnails")
+            os.makedirs(thumbnails_dir, exist_ok=True)
+            
+            # Generar nombre para la miniatura
+            filename = os.path.basename(image_path)
+            thumbnail_path = os.path.join(thumbnails_dir, f"thumb_{filename}")
+            
+            # Crear miniatura con PIL
+            with Image.open(image_path) as img:
+                img.thumbnail(size)
+                img.save(thumbnail_path, "JPEG")
+                
+            return thumbnail_path
+        except Exception as e:
+            logger.error(f"Error al generar miniatura: {e}")
+            return None
+
+
+class GoogleVisionOCR:
+    """
+    Clase para manejar la extracción de texto de imágenes y PDFs usando Google Cloud Vision API.
+    Ofrece mayor precisión que Tesseract, especialmente con pizarras, tableros y texto manuscrito.
+    """
+    
+    def __init__(self, credentials_path: Optional[str] = None):
+        """
+        Inicializa el cliente de Google Vision API.
+        
+        Args:
+            credentials_path: Ruta al archivo JSON de credenciales de Google Cloud.
+                          Si es None, se usará la variable de entorno GOOGLE_APPLICATION_CREDENTIALS
+                          o la ruta por defecto.
+        """
+        self.credentials_path = credentials_path or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or DEFAULT_CREDENTIALS_PATH
+        self.client = None
+        
+    def _init_client(self):
+        """Inicializa el cliente de Google Vision API."""
+        try:
+            credentials = service_account.Credentials.from_service_account_file(self.credentials_path)
+            self.client = vision.ImageAnnotatorClient(credentials=credentials)
+            return True
+        except Exception as e:
+            logger.error(f"Error al inicializar Google Vision API: {e}")
+            return False
+            
+    def extract_text_from_image(self, image_path: str):
+        """
+        Extrae texto de una imagen usando Google Cloud Vision API.
+        
+        Args:
+            image_path: Ruta a la imagen
+            
+        Returns:
+            Texto extraído
+        """
+        try:
+            # Inicializar cliente si aún no se ha hecho
+            if self.client is None and not self._init_client():
+                return ""
+                
+            # Leer imagen
+            with open(image_path, 'rb') as image_file:
+                content = image_file.read()
+                
+            image = vision.Image(content=content)
+            
+            # Detectar texto
+            response = self.client.document_text_detection(image=image)
+            
+            # Extraer texto completo
+            if response.error.message:
+                raise Exception(f"Error en Google Vision API: {response.error.message}")
+                
+            text = response.full_text_annotation.text
+            
+            return text
+            
+        except Exception as e:
+            logger.error(f"Error al extraer texto con Google Vision API: {e}")
+            return ""
+            
+    def image_to_text(self, file_path: str):
+        """
+        Convierte una imagen o un PDF a texto.
+        
+        Args:
+            file_path: Ruta al archivo (imagen o PDF)
+            
+        Returns:
+            Texto extraído
+            
+        Raises:
+            ValueError: Si el archivo no existe o no es un tipo compatible
+            RuntimeError: Si falla el proceso de OCR
+        """
+        # Verificar que el archivo existe
+        if not os.path.exists(file_path):
+            raise ValueError(f"Archivo no encontrado: {file_path}")
+            
+        ext = os.path.splitext(file_path.lower())[1]
+        
+        # Procesar según tipo de archivo
+        if ext == '.pdf':
+            # Convertir PDF a imágenes y procesar cada página
+            try:
+                images = pdf2image.convert_from_path(
+                    file_path, 
+                    dpi=300,
+                    fmt="jpeg",
+                    output_folder=tempfile.gettempdir()
+                )
+                
+                extracted_text_parts = []
+                for i, image in enumerate(images):
+                    # Guardar imagen temporalmente
+                    temp_image_path = os.path.join(tempfile.gettempdir(), f"page_{i}.jpg")
+                    image.save(temp_image_path, "JPEG")
+                    
+                    # Extraer texto
+                    page_text = self.extract_text_from_image(temp_image_path)
+                    extracted_text_parts.append(f"===== PÁGINA {i+1} =====\n\n{page_text}")
+                    
+                    # Eliminar archivo temporal
+                    os.remove(temp_image_path)
+                    
+                return "\n\n".join(extracted_text_parts)
+                
+            except Exception as e:
+                raise RuntimeError(f"Error al procesar PDF con Google Vision: {e}")
+                
+        elif ext in ['.jpg', '.jpeg', '.png', '.bmp', '.webp', '.tiff', '.gif']:
+            # Procesar imagen directamente
+            text = self.extract_text_from_image(file_path)
+            if not text:
+                raise RuntimeError("No se pudo extraer texto de la imagen")
+            return text
+            
+        else:
+            raise ValueError(f"Tipo de archivo no soportado: {ext}")

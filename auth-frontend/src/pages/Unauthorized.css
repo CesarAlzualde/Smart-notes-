@@ -1,0 +1,64 @@
+.unauthorized-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.unauthorized-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  margin: 0 1rem;
+}
+
+.unauthorized-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: #dc3545;
+}
+
+.unauthorized-container h1 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #dc3545;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.error-details {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.action-buttons {
+  margin-top: 2rem;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+}

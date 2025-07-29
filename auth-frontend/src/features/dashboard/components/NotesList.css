@@ -1,0 +1,242 @@
+/* Estilos modernos para el componente de notas */
+
+.note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Tarjeta de nota moderna */
+.modern-note-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.modern-note-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Cabecera de la tarjeta */
+.modern-card-header {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(to right, #f8f9fa, #edf2f7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modern-note-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* Acciones de la nota */
+.note-actions-btn {
+  background: transparent;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-actions-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #2b6cb0;
+}
+
+/* Cuerpo de la tarjeta */
+.modern-card-body {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Imagen en miniatura (si está disponible) */
+.note-thumbnail-container {
+  position: relative;
+  height: 140px;
+  margin: -1rem -1rem 1rem;
+  background-color: #f7fafc;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.note-thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.no-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: #a0aec0;
+  font-size: 3rem;
+  background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+}
+
+/* Etiquetas */
+.note-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.modern-note-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ebf4ff;
+  color: #4299e1;
+  border-radius: 50px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modern-note-tag:hover {
+  background-color: #bee3f8;
+}
+
+.modern-note-topic {
+  background-color: #e9f5e9;
+  color: #38a169;
+}
+
+/* Resumen del contenido */
+.modern-note-summary {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+/* Pie de la tarjeta */
+.modern-card-footer {
+  padding: 0.8rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.8rem;
+  color: #718096;
+  background-color: #fafafa;
+}
+
+.modern-note-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-icon {
+  font-size: 0.9rem;
+}
+
+/* Estilos para los menús desplegables */
+.modern-dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  min-width: 160px;
+}
+
+.modern-dropdown-item {
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.modern-dropdown-item:hover {
+  background-color: #f7fafc;
+}
+
+.modern-dropdown-item i {
+  font-size: 0.9rem;
+  width: 20px;
+}
+
+.danger-item {
+  color: #e53e3e;
+}
+
+.danger-item:hover {
+  background-color: #fff5f5;
+}
+
+/* Estados de carga */
+.notes-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+.notes-loading .spinner {
+  margin-bottom: 1rem;
+}
+
+/* Mensaje de no hay notas */
+.no-notes-message {
+  text-align: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  color: #718096;
+}
+
+.no-notes-message i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #a0aec0;
+}

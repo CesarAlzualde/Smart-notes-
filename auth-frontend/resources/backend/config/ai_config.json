@@ -1,0 +1,38 @@
+{
+    "summarization_params": {
+        "length_penalty": 1.5,
+        "num_beams": 8,
+        "repetition_penalty": 1.8,
+        "no_repeat_ngram_size": 2,
+        "early_stopping": false,
+        "do_sample": true,
+        "top_p": 0.9,
+        "top_k": 50,
+        "min_length": 300,
+        "max_length": 600,
+        "diversity_penalty": 0.5,
+        "num_beam_groups": 2,
+        "temperature": 0.8
+    },
+    "models": {
+        "summarization_models": [
+            "josmunpen/mt5-small-spanish-summarization",
+            "mrm8488/bert2bert_shared-spanish-finetuned-summarization",
+            "facebook/bart-large-cnn",
+            "google/mt5-small"
+        ],
+        "spanish_models_preference": true,
+        "force_spanish_output": true,
+        "grammar_correction_model": "pszemraj/flan-t5-large-grammar-synthesis",
+        "fallback_grammar_model": "vennify/t5-base-grammar-correction",
+        "use_local_model": false
+    },
+    "generation_settings": {
+        "min_summary_words": 30,
+        "max_retries": 3,
+        "aggressive_retry_threshold": 40,
+        "max_input_length": 8192,
+        "max_output_length": 2048,
+        "compression_ratio": 0.25
+    }
+}

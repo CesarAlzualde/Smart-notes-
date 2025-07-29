@@ -1,0 +1,472 @@
+/* AuthModern.css - Estilos modernos para los componentes de autenticación */
+
+.auth-page {
+  background: linear-gradient(135deg, #4a90e2 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 350px; /* Reducido aún más el ancho máximo */
+  perspective: 1000px;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 1.5rem; /* Reducido aún más el padding */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  animation: fadeIn 0.6s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 350px; /* Reducido aún más el ancho máximo */
+  margin: 0 auto;
+  max-height: 90vh;
+  overflow-y: auto; /* Añadida barra de desplazamiento vertical */
+  /* --- Estilos de Scrollbar para Firefox --- */
+  /* Estas propiedades son específicas para Firefox y es normal que muestren una advertencia en navegadores WebKit. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.auth-header h1 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.auth-header p {
+  color: #666;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.auth-logo {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-logo img {
+  max-height: 60px;
+}
+
+/* Modernización de formularios */
+.modern-form h2 {
+  color: #333;
+  font-size: 1.3rem; /* Reducido el tamaño del título */
+  margin-bottom: 1rem; /* Reducido el margen inferior */
+  text-align: center;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 1.2rem; /* Reducido el margen entre grupos */
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #444;
+  transition: color 0.3s ease;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.35rem; /* Ajustada la posición para que esté más cerca del borde */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  transition: color 0.3s ease;
+  font-size: 0.85rem; /* Reducido aún más el tamaño del icono */
+  opacity: 0.75; /* Ligera transparencia para que no destaque tanto */
+}
+
+.modern-input {
+  width: 100%;
+  padding: 0.8rem 0.8rem;
+  padding-left: 1.6rem; /* Reducido aún más el padding izquierdo */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem; /* Reducido el tamaño de la fuente */
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  color: #000000;
+}
+
+/* Cambiar color del placeholder a negro */
+.modern-input::placeholder {
+  color: #000000;
+  opacity: 0.6;
+}
+
+/* Estilo para la barra de desplazamiento - Chrome/Safari/Edge */
+.auth-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.auth-card::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo para botones con apariencia de enlace */
+.link-button {
+  background: transparent;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: #3498db;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+  background-color: #fff;
+}
+
+.modern-input.error {
+  border-color: #e53935;
+  background-color: #fff;
+}
+
+.error-text {
+  color: #e53935;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.modern-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  background-color: #f8f9fa;
+}
+
+.modern-checkbox:checked {
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+}
+
+.modern-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  left: 3px;
+  top: -2px;
+}
+
+.checkbox-container label {
+  margin: 0;
+  font-weight: 400;
+  color: #555;
+  cursor: pointer;
+}
+
+.form-actions {
+  margin-top: 2rem;
+}
+
+.btn-modern {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(to right, #4a90e2, #357ABD);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-modern:hover {
+  background: linear-gradient(to right, #357ABD, #2A6DB0);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
+}
+
+.btn-modern:disabled {
+  background: linear-gradient(to right, #9BB6D3, #8CAAC7);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-modern .spinner {
+  margin-right: 10px;
+  animation: spin 1s linear infinite;
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+
+.auth-divider span {
+  padding: 0 1rem;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #444;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+}
+
+.social-btn img {
+  display: none; /* Ocultar las imágenes de Google y Microsoft */
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #000000; /* Cambiado a negro */
+  font-size: 0.9rem;
+}
+
+/* Clase de utilidad para que un botón parezca un enlace */
+.as-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+  color: #357ABD;
+  text-decoration: underline;
+}
+
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #000000; /* Texto en negro */
+}
+
+/* Mensajes de error y éxito mejorados */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.alert-error {
+  background-color: rgba(229, 57, 53, 0.1);
+  border-left: 4px solid #e53935;
+  color: #d32f2f;
+}
+
+.alert-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-left: 4px solid #4CAF50;
+  color: #388e3c;
+}
+
+.alert-icon {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Indicador de fuerza de contraseña */
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.strength-meter {
+  height: 4px;
+  border-radius: 2px;
+  background-color: #eee;
+  margin-bottom: 0.5rem;
+}
+
+.strength-meter-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-weak { background-color: #e53935; width: 25%; }
+.strength-fair { background-color: #FF9800; width: 50%; }
+.strength-good { background-color: #FFC107; width: 75%; }
+.strength-strong { background-color: #4CAF50; width: 100%; }
+
+.strength-text {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.step-number,
+.step-text {
+  color: #000000 !important;
+}
+
+/* Responsividad */
+@media screen and (max-width: 480px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .auth-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .auth-links {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .social-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

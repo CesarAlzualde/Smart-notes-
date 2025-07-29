@@ -1,0 +1,420 @@
+import React, { useState, useEffect } from 'react';
+import { analysisApi } from '../../../api/analysis';
+import type { TopicDistribution } from '../../../api/analysis';
+import { Form, Button, Badge, ProgressBar } from 'react-bootstrap';
+import './TopicsPanel.modern.css';
+
+interface Topic {
+  id: number;
+  name: string;
+  confidence?: number;
+}
+
+interface TopicsPanelProps {
+  mainTopic?: string;
+  topics?: Array<Topic>;
+  suggestedTopics?: Array<string>;
+  topicsDistribution?: Array<TopicDistribution>;
+  confidence?: number;
+  availableTopics?: Array<Topic>;
+  onSaveTopics?: (mainTopic: string, topics: Array<Topic>) => void;
+  noteId?: number;
+  content?: string;
+}
+
+const TopicsPanel: React.FC<TopicsPanelProps> = ({ 
+  mainTopic = '', 
+  topics = [], 
+  suggestedTopics = [],
+  topicsDistribution = [],
+  confidence = 0,
+  availableTopics = [],
+  onSaveTopics,
+  noteId,
+  content = ''
+}) => {
+  const [showPanel, setShowPanel] = useState<boolean>(true);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editMainTopic, setEditMainTopic] = useState<string>(mainTopic);
+  const [editTopics, setEditTopics] = useState<Topic[]>(topics);
+  const [selectedTopic, setSelectedTopic] = useState<string>('');
+  
+  // Estado para análisis de temas
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [localTopicsDistribution, setLocalTopicsDistribution] = useState<TopicDistribution[]>(topicsDistribution);
+  const [localSuggestedTopics, setLocalSuggestedTopics] = useState<string[]>(suggestedTopics);
+  const [localConfidence, setLocalConfidence] = useState<number>(confidence);
+  const [localMainTopic, setLocalMainTopic] = useState<string>(mainTopic);
+  
+  // Analizar temas cuando cambia el contenido
+  useEffect(() => {
+    if (content && content.trim().length > 50) {
+      analyzeTopics(content);
+    }
+  }, [content, noteId]);
+  
+  // Función para analizar temas
+  const analyzeTopics = async (textContent: string) => {
+    // No analizamos si estamos en modo edición
+    if (isEditing) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await analysisApi.analyzeTopics(textContent, noteId);
+      
+      setLocalTopicsDistribution(result.topics_distribution);
+      setLocalSuggestedTopics(result.suggested_topics);
+      setLocalConfidence(result.main_topic_confidence * 100); // Convertir a porcentaje
+      setLocalMainTopic(result.main_topic);
+      
+      // Solo actualizar con nuevos valores si no estamos en modo edición
+      if (!isEditing && onSaveTopics && result.main_topic) {
+        // Crear estructura de temas basada en la distribución
+        // Nota: guardamos el análisis en las variables locales, pero no llamamos
+        // a onSaveTopics aquí para evitar loops - el componente padre debe manejar la persistencia
+        // cuando decide que es apropiado (por ejemplo, al guardar explícitamente)
+        
+        // El código siguiente está comentado para evitar llamadas automáticas que puedan generar loops
+        /*
+        const newTopics = result.topics_distribution
+          .filter(item => item.topic !== result.main_topic && item.percentage > 0.05) // Solo temas con más de 5% de relevancia
+          .map(item => {
+            const existingTopic = availableTopics.find(t => t.name === item.topic);
+            return existingTopic || {
+              id: Math.floor(Math.random() * -1000), // ID temporal negativo
+              name: item.topic
+            };
+          });
+        
+        onSaveTopics(result.main_topic, newTopics);
+        */
+      }
+    } catch (err) {
+      console.error('Error al analizar temas:', err);
+      setError('Error al analizar temas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Manejar modo de edición
+  const handleEditMode = () => {
+    setIsEditing(true);
+    setEditMainTopic(mainTopic);
+    setEditTopics([...topics]);
+  };
+
+  // Cancelar edición
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditMainTopic(mainTopic);
+    setEditTopics([...topics]);
+  };
+
+  // Guardar cambios en temas
+  const handleSaveTopics = () => {
+    if (onSaveTopics) {
+      onSaveTopics(editMainTopic, editTopics);
+    }
+    setIsEditing(false);
+  };
+
+  // Añadir tema seleccionado
+  const handleAddTopic = () => {
+    if (selectedTopic) {
+      const topic = availableTopics.find(t => t.name === selectedTopic);
+      if (topic) {
+        const exists = editTopics.some(t => t.id === topic.id);
+        if (!exists) {
+          setEditTopics([...editTopics, topic]);
+        }
+      }
+      setSelectedTopic('');
+    }
+  };
+
+  // Eliminar tema
+  const handleRemoveTopic = (topicId: number) => {
+    setEditTopics(editTopics.filter(t => t.id !== topicId));
+  };
+
+  // Añadir tema sugerido
+  const handleAddSuggested = (topicName: string) => {
+    const exists = editTopics.some(t => t.name === topicName);
+    
+    if (!exists) {
+      // Buscar si ya existe un tema con este nombre
+      const existingTopic = availableTopics.find(t => t.name === topicName);
+      
+      if (existingTopic) {
+        setEditTopics([...editTopics, existingTopic]);
+      } else {
+        // Crear un nuevo tema si no existe
+        const newTopic: Topic = {
+          id: Math.floor(Math.random() * -1000), // ID temporal negativo
+          name: topicName
+        };
+        setEditTopics([...editTopics, newTopic]);
+      }
+    }
+  };
+
+  // Determina qué clase usar para la barra de progreso según el porcentaje
+  const getProgressColorClass = (percentage: number): string => {
+    if (percentage >= 80) return 'high';
+    if (percentage >= 50) return 'medium';
+    return 'low';
+  };
+
+  return (
+    <div className="topics-panel">
+      <div className="panel-header" onClick={() => setShowPanel(!showPanel)}>
+        <h3>
+          <i className="fas fa-tags"></i> 
+          Clasificación temática
+          <i className={`fas fa-chevron-${showPanel ? 'up' : 'down'} toggle-icon`}></i>
+        </h3>
+      </div>
+      
+      {showPanel && (
+        <div className="panel-content">
+          {loading ? (
+            <div className="loading-indicator">Analizando temas...</div>
+          ) : error ? (
+            <div className="error-message">{error}</div>
+          ) : (
+            <div className="topics-container">
+              {/* Tema principal */}
+              <div className="main-topic-section mb-3">
+                <div className="section-header d-flex justify-content-between align-items-center mb-2">
+                  <h4 className="section-title mb-0">
+                    <i className="fas fa-bookmark"></i> Tema principal
+                  </h4>
+                  
+                  {!isEditing && (
+                    <Button 
+                      variant="link" 
+                      className="p-0 edit-button" 
+                      onClick={handleEditMode}
+                    >
+                      <i className="fas fa-pen"></i> Editar
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="main-topic-container">
+                  {mainTopic ? (
+                    <div className="main-topic">
+                      <div className="topic-badge primary">
+                        {mainTopic}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="empty-text">Sin tema principal asignado</p>
+                  )}
+                </div>
+              </div>
+              
+              {/* Distribución de temas visualizada */}
+              {localTopicsDistribution.length > 0 && (
+                <div className="mb-3">
+                  <h6><i className="fas fa-chart-pie"></i> Distribución de temas</h6>
+                  <div className="topics-distribution mt-2">
+                    {localTopicsDistribution.map((item, index) => (
+                      <div key={index} className="topic-distribution-item mb-2">
+                        <div className="d-flex justify-content-between mb-1">
+                          <small>{item.topic}</small>
+                          <small>{item.percentage}%</small>
+                        </div>
+                        <ProgressBar 
+                          now={item.percentage} 
+                          variant={index === 0 ? 'primary' : 'info'} 
+                          style={{ height: '6px' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            
+              {/* Temas relacionados */}
+              <div className="section">
+                <h4 className="section-title">
+                  <i className="fas fa-layer-group"></i> Temas relacionados
+                </h4>
+                
+                {topics.length > 0 ? (
+                  <div className="topic-badges">
+                    {topics.map((topic) => (
+                      <div 
+                        className="topic-badge" 
+                        key={topic.id}
+                      >
+                        {topic.name}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="empty-text">Sin temas relacionados</p>
+                )}
+              </div>
+            
+              {/* Temas sugeridos */}
+              {localSuggestedTopics.length > 0 && (
+                <div className="section">
+                  <h4 className="section-title">
+                    <i className="fas fa-lightbulb"></i> Sugerencias
+                  </h4>
+                  <div className="topic-badges suggestion-badges">
+                    {localSuggestedTopics.map((topic, index) => (
+                      <div className="topic-badge suggestion" key={index}>
+                        {topic}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {localMainTopic && localMainTopic !== mainTopic && (
+                <div className="mt-2">
+                  <p className="text-muted small">Sugerido por el análisis: </p>
+                  <div className="topic-badge light">
+                    {localMainTopic} 
+                  </div>
+                </div>
+              )}
+              
+              {localConfidence > 0 && (
+                <div className="progress-container mt-2">
+                  <div className="progress-header">
+                    <span className="progress-label">Confianza</span>
+                    <span className="progress-value">{Math.round(localConfidence)}%</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div 
+                      className={`progress-indicator ${getProgressColorClass(localConfidence)}`}
+                      style={{ width: `${localConfidence}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Sección de edición de temas */}
+          {isEditing && (
+            <>
+              <div className="mb-3">
+                <Form.Label>Tema principal</Form.Label>
+                <Form.Select 
+                  value={editMainTopic}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setEditMainTopic(e.target.value)}
+                >
+                  <option value="">Sin tema principal</option>
+                  {availableTopics.map((topic) => (
+                    <option key={topic.id} value={topic.name}>
+                      {topic.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </div>
+          
+              <div className="mb-3">
+                <Form.Label>Temas relacionados</Form.Label>
+                <div className="selected-topics mb-2">
+                  {editTopics.map((topic) => (
+                    <Badge 
+                      bg="primary" 
+                      className="me-1 mb-1 topic-badge"
+                      key={topic.id}
+                    >
+                      {topic.name}
+                      <span 
+                        className="topic-remove-btn ms-1" 
+                        onClick={() => handleRemoveTopic(topic.id)}
+                      >
+                        ×
+                      </span>
+                    </Badge>
+                  ))}
+                  {editTopics.length === 0 && (
+                    <div className="text-muted small">Sin temas seleccionados</div>
+                  )}
+                </div>
+                
+                <div className="d-flex mb-2">
+                  <Form.Select 
+                    value={selectedTopic}
+                    onChange={(e) => setSelectedTopic(e.target.value)}
+                    className="me-2"
+                  >
+                    <option value="">Seleccionar un tema...</option>
+                    {availableTopics
+                      .filter((topic) => !editTopics.some((t) => t.name === topic.name))
+                      .map((topic) => (
+                        <option key={topic.id} value={topic.name}>
+                          {topic.name}
+                        </option>
+                      ))}
+                  </Form.Select>
+                  <Button 
+                    variant="outline-secondary" 
+                    onClick={handleAddTopic}
+                  >
+                    <i className="fas fa-plus"></i>
+                  </Button>
+                </div>
+              </div>
+          
+              {/* Temas sugeridos (modo edición) */}
+              {suggestedTopics.length > 0 && (
+                <div className="mt-3 mb-3">
+                  <h6><i className="fas fa-lightbulb"></i> Sugerencias</h6>
+                  <div className="d-flex flex-wrap gap-1 mt-2">
+                    {suggestedTopics
+                      .filter(topic => !editTopics.some(t => t.name === topic))
+                      .map((topic, index) => (
+                        <Badge 
+                          bg="light" 
+                          text="dark" 
+                          className="me-1 mb-1 topic-badge" 
+                          key={index}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleAddSuggested(topic)}
+                        >
+                          {topic} <span className="ms-1 text-primary">+</span>
+                        </Badge>
+                      ))}
+                  </div>
+                </div>
+              )}
+          
+              <div className="d-flex justify-content-end mt-3">
+                <Button 
+                  variant="outline-secondary" 
+                  size="sm" 
+                  className="me-2"
+                  onClick={handleCancelEdit}
+                >
+                  <i className="fas fa-times"></i> Cancelar
+                </Button>
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={handleSaveTopics}
+                >
+                  <i className="fas fa-save"></i> Guardar clasificación
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TopicsPanel;

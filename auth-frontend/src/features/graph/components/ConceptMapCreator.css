@@ -1,0 +1,63 @@
+.concept-map-creator {
+  width: 100%;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+.concept-map-container {
+  height: 70vh;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.empty-graph-container {
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #adb5bd;
+  border-radius: 0.25rem;
+}
+
+.node-info-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
+}
+
+.loading-container {
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.badge-main-topic {
+  background-color: #E53E3E !important;
+}
+
+.badge-topic {
+  background-color: #DD6B20 !important;
+}
+
+.badge-entity {
+  background-color: #38A169 !important;
+}
+
+.badge-keyword {
+  background-color: #3182CE !important;
+}
+
+.badge-note {
+  background-color: #805AD5 !important;
+}
+
+.badge-entity-type {
+  background-color: #319795 !important;
+}

@@ -1,0 +1,45 @@
+.text-stats {
+  font-size: 0.9rem;
+}
+
+.card-toggle {
+  color: #6c757d;
+}
+
+.card-toggle:hover {
+  color: #495057;
+}
+
+.tone-indicator {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.progress {
+  background-color: #e9ecef;
+  overflow: hidden;
+}
+
+/* Colores para tipos de tono */
+.tone-formal {
+  color: #7048e8;
+}
+
+.tone-academic {
+  color: #2b6cb0;
+}
+
+.tone-technical {
+  color: #0986c3;
+}
+
+.tone-informal {
+  color: #38a169;
+}
+
+.tone-emotional {
+  color: #e53e3e;
+}
+
+.tone-neutral {
+  color: #718096;
+}

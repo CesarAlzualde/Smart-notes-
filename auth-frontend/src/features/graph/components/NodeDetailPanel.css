@@ -1,0 +1,43 @@
+.node-detail-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 250px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1010;
+  transition: transform 0.3s ease-in-out;
+}
+
+.node-detail-panel.hidden {
+  transform: translateX(100%);
+}
+
+.node-detail-panel h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.node-detail-panel p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+
+.close-btn:hover {
+  color: #333;
+}

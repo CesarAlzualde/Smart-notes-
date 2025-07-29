@@ -1,0 +1,170 @@
+{
+  "name": "auth-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "public/electron.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode production",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "postinstall": "patch-package",
+    "test": "vitest run --reporter=json --outputFile=vitest-report.json",
+    "test:basic": "vitest run src/test/basic.test.ts --reporter=json --outputFile=vitest-basic-report.json",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_IS_DEV=1 electron .",
+    "build-electron": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder --publish=never"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@hookform/resolvers": "^5.1.1",
+    "@milkdown/core": "^7.14.0",
+    "@milkdown/plugin-diagram": "^7.7.0",
+    "@milkdown/plugin-math": "^7.5.9",
+    "@milkdown/preset-commonmark": "^7.14.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
+    "@tanstack/react-query": "^5.80.7",
+    "@tiptap/extension-code": "^2.22.3",
+    "@tiptap/extension-code-block-lowlight": "^2.22.3",
+    "@tiptap/extension-image": "^2.22.3",
+    "@tiptap/extension-link": "^2.22.3",
+    "@tiptap/extension-placeholder": "^2.22.3",
+    "@tiptap/react": "^2.22.3",
+    "@tiptap/starter-kit": "^2.22.3",
+    "@types/react-bootstrap": "^1.0.1",
+    "@types/react-dropzone": "^4.2.2",
+    "@types/react-select": "^5.0.0",
+    "aframe": "^1.7.1",
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.9.0",
+    "bootstrap-icons": "^1.11.3",
+    "katex": "^0.16.22",
+    "lowlight": "^3.3.0",
+    "mermaid": "^11.7.0",
+    "node-releases": "^2.0.19",
+    "postcss": "^8.5.6",
+    "react": "^19.1.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.1.0",
+    "react-dropzone": "^14.3.8",
+    "react-force-graph": "^1.47.7",
+    "react-force-graph-3d": "^1.27.0",
+    "react-hook-form": "^7.57.0",
+    "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^6.30.1",
+    "react-select": "^5.10.1",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^3.4.4",
+    "three": "^0.160.0",
+    "three-spritetext": "^1.10.0",
+    "zod": "^3.25.64",
+    "zustand": "^5.0.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/aframe": "^1.2.8",
+    "@types/node": "^24.0.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "browserslist": "^4.25.1",
+    "electron": "^37.2.1",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.25.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "extract-zip": "^2.0.1",
+    "fd-slicer": "^1.1.0",
+    "globals": "^16.0.0",
+    "jsdom": "^26.1.0",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^6.3.5",
+    "vite-plugin-checker": "^0.9.3",
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vite-plugin-pwa": "^1.0.0",
+    "vitest": "^3.2.4",
+    "yauzl": "^3.2.0"
+  },
+  "description": "Sistema inteligente de notas con análisis de IA, OCR avanzado y mapas conceptuales",
+  "author": "Apuntes 2.0 Team",
+  "build": {
+    "appId": "com.apuntes.app",
+    "productName": "Apuntes 2.0 - Sistema de Notas con IA",
+    "copyright": "Copyright © 2025 Apuntes 2.0 Team",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "public/electron.js",
+      "public/preload.js",
+      "node_modules/**/*",
+      "!node_modules/.cache/**/*",
+      "!**/*.{md,txt,log}"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/dist/ApuntesBackend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../backend/config",
+        "to": "config",
+        "filter": [
+          "**/*.json"
+        ]
+      },
+      {
+        "from": "../backend/.env",
+        "to": ".env"
+      }
+    ],
+    "win": {
+      "target": {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Apuntes 2.0",
+      "artifactName": "${productName}-${version}-Setup.${ext}",
+      "include": "installer.nsh"
+    }
+  },
+  "optionalDependencies": {
+    "@esbuild/win32-x64": "^0.25.6"
+  }
+}

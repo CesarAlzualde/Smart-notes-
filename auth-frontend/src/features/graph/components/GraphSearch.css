@@ -1,0 +1,47 @@
+.graph-search-box {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  width: 300px;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.graph-search-box:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.search-results .list-group-item {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+}
+
+.search-results .list-group-item:hover {
+  background-color: #f5f5f5;
+}
+
+.search-results .badge {
+  font-size: 11px;
+  font-weight: normal;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .graph-search-box {
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+}

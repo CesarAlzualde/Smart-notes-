@@ -1,0 +1,90 @@
+.rich-text-editor {
+  @apply border border-gray-300 rounded-lg shadow-sm bg-white;
+}
+
+.rich-text-editor .editor-content {
+  @apply p-4 min-h-[300px] prose max-w-none;
+}
+
+/* Estilizado del editor */
+.ProseMirror {
+  @apply outline-none w-full;
+}
+
+.ProseMirror p {
+  @apply my-2;
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold my-4;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold my-3;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-semibold my-2;
+}
+
+.ProseMirror ul {
+  @apply list-disc pl-5 my-2;
+}
+
+.ProseMirror ol {
+  @apply list-decimal pl-5 my-2;
+}
+
+.ProseMirror pre {
+  @apply bg-gray-100 p-3 rounded my-3 overflow-auto;
+}
+
+.ProseMirror code {
+  @apply font-mono text-sm bg-gray-100 px-1 py-0.5 rounded;
+}
+
+.ProseMirror pre code {
+  @apply bg-transparent p-0;
+}
+
+.ProseMirror blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto rounded;
+}
+
+.ProseMirror a {
+  @apply text-blue-600 hover:underline;
+}
+
+/* Barra de herramientas */
+.editor-toolbar {
+  @apply flex items-center border-t border-gray-200 p-2 flex-wrap;
+}
+
+.editor-toolbar button {
+  @apply p-2 mx-1 rounded hover:bg-gray-100 transition-colors;
+}
+
+.editor-toolbar button.is-active {
+  @apply bg-gray-200 text-blue-600;
+}
+
+/* Soporte para matemáticas y diagramas */
+.math-block {
+  @apply my-4 overflow-auto p-2;
+}
+
+.math-error {
+  @apply border-l-4 border-red-500 bg-red-100 text-red-700 p-2;
+}
+
+.mermaid-container {
+  @apply my-4 flex justify-center;
+}
+
+.mermaid-error {
+  @apply border-l-4 border-red-500 bg-red-100 text-red-700 p-2 my-2;
+}

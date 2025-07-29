@@ -1,0 +1,47 @@
+{
+    "summarization_params": {
+        "length_penalty": 1.2,
+        "num_beams": 8,
+        "repetition_penalty": 1.8,
+        "no_repeat_ngram_size": 3,
+        "early_stopping": false,
+        "do_sample": true,
+        "temperature": 0.8,
+        "top_k": 40,
+        "top_p": 0.9,
+        "min_length": 100,
+        "max_length": 400,
+        "skip_special_tokens": true,
+        "clean_up_tokenization_spaces": true
+    },
+    "models": {
+        "summarization_models": [
+            "facebook/bart-large-cnn",
+            "facebook/bart-base",
+            "josmunpen/mt5-small-spanish-summarization",
+            "mrm8488/bert2bert_shared-spanish-finetuned-summarization",
+            "google/mt5-small"
+        ],
+        "sentiment_models": [
+            "j-hartmann/emotion-english-distilroberta-base",
+            "cardiffnlp/twitter-roberta-base-emotion",
+            "microsoft/DialoGPT-medium"
+        ],
+        "spanish_models_preference": true,
+        "force_spanish_output": true,
+        "grammar_correction_models": [
+            "google/mt5-small",
+            "t5-small",
+            "google/flan-t5-small"
+        ],
+        "use_local_model": false
+    },
+    "generation_settings": {
+        "min_summary_words": 30,
+        "max_retries": 3,
+        "aggressive_retry_threshold": 40,
+        "max_input_length": 8192,
+        "max_output_length": 2048,
+        "compression_ratio": 0.25
+    }
+}

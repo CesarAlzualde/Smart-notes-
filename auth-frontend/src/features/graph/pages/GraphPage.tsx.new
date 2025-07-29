@@ -1,0 +1,545 @@
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { ForceGraph2D } from 'react-force-graph';
+import { graphApi } from '../../../api/graph';
+import { NodeInfoPanel, GraphSearch, GraphLegend, ConceptMapCreator } from '../components';
+import type { GraphNode, GraphData } from '../types/graph.types';
+import { Tab, Tabs, Alert, Container, Button, Row, Col, Spinner, Form, Nav } from 'react-bootstrap';
+
+import './GraphPage.css';
+
+// Definimos tipos personalizados para las estructuras de datos
+interface NodeObject {
+  id: string | number;
+  x?: number;
+  y?: number;
+  [key: string]: any;
+}
+
+interface GraphEdge {
+  source: string | number | NodeObject;
+  target: string | number | NodeObject;
+  label?: string;
+  color?: string;
+  width?: number;
+}
+
+// Tipo para el método ref del ForceGraph2D
+interface ForceGraphMethods {
+  zoom: (scale: number, durationMs?: number) => void;
+  centerAt: (x: number, y: number, durationMs?: number) => void;
+  getGraphBbox: (params?: { nodeFilter?: (node: GraphNode) => boolean }) => {
+    x: [number, number];
+    y: [number, number];
+  };
+  d3ReheatSimulation: () => void;
+  d3Force: (name: string, force?: any) => any;
+  zoomToFit: (transitionMs?: number, padding?: number) => void;
+  // Esta propiedad es necesaria para acceder al contenedor del grafo
+  containerElem?: {
+    __zoom: {
+      k: number;
+      x: number;
+      y: number;
+    }
+  };
+}
+
+const GraphPage: React.FC = () => {
+  // Estados básicos del componente
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('explore');
+  const graphRef = useRef<ForceGraphMethods | null>(null);
+  const [conceptMapCreated, setConceptMapCreated] = useState<boolean>(false);
+  const [conceptMapText, setConceptMapText] = useState<string>('');
+  const [selectedNoteIds, setSelectedNoteIds] = useState<number[]>([]);
+  
+  // Configuración de colores para tipos de nodos con useMemo para evitar re-renders
+  const nodeColors = useMemo(() => ({
+    concept: '#4285F4',   // azul
+    note: '#34A853',     // verde
+    tag: '#EA4335',      // rojo
+    user: '#FBBC05',     // amarillo
+    default: '#9C27B0'   // morado (para otros tipos)
+  }), []);
+
+  // Función para expandir un nodo y obtener sus nodos relacionados
+  const expandNode = useCallback(async (nodeId: string | number) => {
+    try {
+      setLoading(true);
+      // Obtener los vecinos del nodo seleccionado
+      const neighbors = await graphApi.getNodeNeighbors(nodeId);
+      
+      if (neighbors && Array.isArray(neighbors.nodes) && Array.isArray(neighbors.links)) {
+        // Asegurarse de no duplicar nodos existentes
+        const existingNodeIds = new Set(graphData.nodes.map(node => node.id));
+        const newNodes = neighbors.nodes
+          .filter(node => !existingNodeIds.has(node.id))
+          .map(node => ({
+            ...node,
+            color: nodeColors[node.type as keyof typeof nodeColors] || nodeColors.default,
+            size: 6
+          }));
+          
+        // Asegurarse de no duplicar enlaces existentes
+        const existingLinkIds = new Set(
+          graphData.links.map(link =>
+            typeof link.source === 'object' && link.source !== null 
+              ? `${link.source.id}-${typeof link.target === 'object' && link.target !== null ? link.target.id : link.target}` 
+              : `${link.source}-${link.target}`)
+        );
+        
+        const newLinks = neighbors.links.filter(link => {
+          const linkId = `${link.source}-${link.target}`;
+          return !existingLinkIds.has(linkId);
+        });
+        
+        // Actualizar el estado del grafo con los nuevos nodos y enlaces
+        setGraphData(prevData => ({
+          nodes: [...prevData.nodes, ...newNodes],
+          links: [...prevData.links, ...newLinks]
+        }));
+        
+        // Marcar el nodo como expandido
+        const updatedNodes = graphData.nodes.map(node => 
+          node.id === nodeId ? { ...node, expanded: true } : node
+        );
+        
+        setGraphData(prev => ({
+          ...prev,
+          nodes: updatedNodes
+        }));
+        
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Error expanding node:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [graphData, nodeColors]);
+
+  // Función para manejar clics en los nodos
+  const handleNodeClick = useCallback((node: GraphNode) => {
+    setSelectedNode(node);
+
+    if (node && !node.expanded) {
+      expandNode(node.id);
+    }
+  }, [expandNode]);
+
+  // Cargar el grafo completo
+  const loadFullGraph = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const visualization = await graphApi.getFullGraph();
+      
+      // Adaptar la estructura de GraphVisualization a GraphData (son estructuras diferentes)
+      // Esto es necesario porque getFullGraph() devuelve GraphVisualization, no GraphData
+      const initialNodes: GraphNode[] = [];
+      const initialLinks: any[] = [];
+      
+      // Construir un grafo inicial básico con datos estadísticos si están disponibles
+      if (visualization && visualization.statistics) {
+        // Usar datos de estadísticas para crear un grafo básico inicial si no hay nodos
+        const stats = visualization.statistics;
+        
+        // Crear un nodo central para las estadísticas
+        initialNodes.push({
+          id: 'stats-center',
+          label: `Grafo (${stats.total_concepts} conceptos)`,
+          type: 'concept',
+          color: nodeColors.concept,
+          size: 12
+        });
+        
+        // Si hay una nube de conceptos, agregar algunos de ellos como nodos
+        if (visualization.concepts_cloud && visualization.concepts_cloud.length > 0) {
+          // Limitar a los 10 conceptos más relevantes
+          const topConcepts = visualization.concepts_cloud.slice(0, 10);
+          
+          topConcepts.forEach((concept, index) => {
+            initialNodes.push({
+              id: `concept-${index}`,
+              label: concept.text,
+              type: 'concept',
+              color: nodeColors.concept,
+              size: Math.max(5, Math.min(10, concept.size / 10)) // Normalizar tamaño
+            });
+            
+            initialLinks.push({
+              source: 'stats-center',
+              target: `concept-${index}`,
+              label: 'relacionado'
+            });
+          });
+        }
+        
+        // Si hay mapas recientes, agregar algunos como nodos
+        if (visualization.recent_maps && visualization.recent_maps.length > 0) {
+          // Limitar a 5 mapas recientes
+          const recentMaps = visualization.recent_maps.slice(0, 5);
+          
+          recentMaps.forEach(map => {
+            initialNodes.push({
+              id: map.id,
+              label: map.name,
+              type: 'map',
+              color: nodeColors.note,
+              size: 8,
+              properties: {
+                concept_count: map.concept_count,
+                relation_count: map.relation_count,
+                created_at: map.created_at
+              }
+            });
+            
+            initialLinks.push({
+              source: 'stats-center',
+              target: map.id,
+              label: 'contiene'
+            });
+          });
+        }
+      }
+      
+      setGraphData({
+        nodes: initialNodes,
+        links: initialLinks
+      });
+    } catch (err) {
+      console.error('Error loading graph:', err);
+      setError('Error al cargar el grafo. Intente de nuevo más tarde.');
+    } finally {
+      setLoading(false);
+    }
+  }, [nodeColors]);
+
+  // Función para encontrar un nodo y centrarlo
+  const focusNode = useCallback((nodeId: string | number) => {
+    if (!graphRef.current) return;
+    
+    const node = graphData.nodes.find(node => node.id === nodeId);
+    if (node && node.x && node.y) {
+      graphRef.current.centerAt(node.x, node.y, 1000);
+      graphRef.current.zoom(2, 1000);
+    }
+  }, [graphData.nodes]);
+
+  // Manejar notificación de mapa conceptual creado
+  const handleMapCreated = useCallback(() => {
+    setConceptMapCreated(true);
+    // Ocultar la notificación después de 5 segundos
+    setTimeout(() => setConceptMapCreated(false), 5000);
+  }, []);
+
+  // Cargar el grafo al montar el componente
+  useEffect(() => {
+    loadFullGraph();
+  }, [loadFullGraph]);
+
+  // Funciones para controles de zoom
+  const handleZoomIn = useCallback(() => {
+    if (graphRef.current) {
+      graphRef.current.zoom(2); // Duplicar escala
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if (graphRef.current) {
+      graphRef.current.zoom(0.5); // Reducir escala a la mitad
+    }
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    if (graphRef.current) {
+      graphRef.current.zoomToFit(400);
+    }
+    setSelectedNode(null);
+  }, []);
+  
+  return (
+    <div 
+      className="graph-container"
+      role="application"
+      aria-label="Visualización de grafo interactiva"
+    >
+      <Tab.Container id="graph-tabs" activeKey={activeTab} onSelect={(k) => k && setActiveTab(k)}>
+        <Nav variant="tabs" className="mb-3">
+          <Nav.Item>
+            <Nav.Link eventKey="explore">Explorar Grafo</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey="create">Crear Mapa Conceptual</Nav.Link>
+          </Nav.Item>
+        </Nav>
+        
+        <Tab.Content>
+          <Tab.Pane eventKey="explore">
+            {error && <Alert variant="danger">{error}</Alert>}
+            
+            {loading && !error ? (
+              <div className="loading-indicator">
+                <Spinner animation="border" />
+                <p>Cargando grafo...</p>
+              </div>
+            ) : (
+              <>
+                {/* Controles de zoom y vista */}
+                <div 
+                  className="graph-controls"
+                  role="toolbar"
+                  aria-label="Controles del grafo"
+                >
+                  <Button 
+                    className="graph-control-button"
+                    onClick={handleZoomIn}
+                    aria-label="Aumentar zoom"
+                    title="Aumentar zoom"
+                    variant="outline-primary"
+                  >
+                    <i className="fas fa-search-plus" aria-hidden="true"></i>
+                    <span>Acercar</span>
+                  </Button>
+                  <Button 
+                    className="graph-control-button"
+                    onClick={handleZoomOut}
+                    aria-label="Reducir zoom"
+                    title="Reducir zoom"
+                    variant="outline-primary"
+                  >
+                    <i className="fas fa-search-minus" aria-hidden="true"></i>
+                    <span>Alejar</span>
+                  </Button>
+                  <Button 
+                    className="graph-control-button"
+                    onClick={handleResetView}
+                    aria-label="Restablecer vista"
+                    title="Restablecer vista"
+                    variant="outline-secondary"
+                  >
+                    <i className="fas fa-sync-alt" aria-hidden="true"></i>
+                    <span>Restablecer</span>
+                  </Button>
+                </div>
+                
+                <GraphSearch 
+                  onSelectNode={(node: GraphNode) => {
+                    setSelectedNode(node);
+                    focusNode(node.id);
+                  }}
+                />
+                
+                {selectedNode && (
+                  <NodeInfoPanel
+                    node={selectedNode}
+                    onClose={() => setSelectedNode(null)}
+                  />
+                )}
+                
+                <div id="node-tooltip" className="graph-tooltip"></div>
+                <div id="link-tooltip" className="graph-tooltip"></div>
+
+                <ForceGraph2D
+                  ref={graphRef}
+                  graphData={graphData}
+                  // Usamos tooltips HTML personalizados en lugar de los nativos
+                  nodeColor={(node: any) => {
+                    const graphNode = node as unknown as GraphNode;
+                    return graphNode.color || '#ccc';
+                  }}
+                  // Tamaño de nodo basado en sus conexiones
+                  nodeRelSize={6}
+                  // Efectos visuales para nodos
+                  nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+                    const graphNode = node as unknown as GraphNode;
+                    const label = graphNode.label;
+                    const fontSize = 12/globalScale;
+                    const size = graphNode.size || 6;
+                    
+                    // Dibujar círculo para el nodo
+                    ctx.beginPath();
+                    ctx.arc(node.x || 0, node.y || 0, size, 0, 2 * Math.PI);
+                    ctx.fillStyle = graphNode.color || '#ccc';
+                    ctx.fill();
+                    
+                    // Si es un nodo seleccionado, agregar borde
+                    if (selectedNode && selectedNode.id === graphNode.id) {
+                      ctx.beginPath();
+                      ctx.arc(node.x || 0, node.y || 0, size + 2/globalScale, 0, 2 * Math.PI);
+                      ctx.strokeStyle = '#FF9800';
+                      ctx.lineWidth = 2 / globalScale;
+                      ctx.stroke();
+                    }
+                    
+                    // Añadir animación de pulso para nodos expandibles no expandidos
+                    if (!graphNode.expanded && !graphNode._expanding) {
+                      const pulseFactor = (1 + Math.sin(Date.now() / 300) * 0.1);
+                      ctx.beginPath();
+                      ctx.arc(node.x || 0, node.y || 0, size * pulseFactor, 0, 2 * Math.PI);
+                      ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+                      ctx.stroke();
+                    }
+                    
+                    // Mostrar etiqueta solo si estamos haciendo zoom o es un nodo importante
+                    if (globalScale > 1 || graphNode.size > 7) {
+                      ctx.font = `${fontSize}px Sans-Serif`;
+                      ctx.textAlign = 'center';
+                      ctx.textBaseline = 'middle';
+                      ctx.fillStyle = 'black';
+                      
+                      // Fondo para la etiqueta
+                      const textWidth = ctx.measureText(label).width;
+                      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                      ctx.fillRect(
+                        node.x - textWidth/2 - 2, 
+                        node.y + size + 2, 
+                        textWidth + 4, 
+                        fontSize + 2
+                      );
+                      
+                      // Texto de la etiqueta
+                      ctx.fillStyle = '#333';
+                      ctx.fillText(label, node.x || 0, node.y + size + fontSize/2 + 2);
+                    }
+                  }}
+                  // Mostrar tooltips al pasar sobre un nodo
+                  onNodeHover={(node: any) => {
+                    const tooltipEl = document.getElementById('node-tooltip');
+                    if (!tooltipEl) return;
+                    
+                    if (node) {
+                      const graphNode = node as unknown as GraphNode;
+                      const x = node.x || 0;
+                      const y = node.y || 0;
+                      
+                      const graphElem = graphRef.current?.containerElem;
+                      if (graphElem) {
+                        // Usar las coordenadas del grafo para posicionar el tooltip
+                        const pixelX = x * graphElem.__zoom.k + graphElem.__zoom.x;
+                        const pixelY = y * graphElem.__zoom.k + graphElem.__zoom.y;
+                        
+                        tooltipEl.innerHTML = `
+                          <div>
+                            <strong>${graphNode.label}</strong>
+                            <div>${graphNode.type || 'desconocido'}</div>
+                          </div>
+                        `;
+                        
+                        tooltipEl.style.left = `${pixelX}px`;
+                        tooltipEl.style.top = `${pixelY - 40}px`;
+                        tooltipEl.style.display = 'block';
+                      }
+                    } else {
+                      tooltipEl.style.display = 'none';
+                    }
+                  }}
+                  // Mostrar tooltips al pasar sobre un enlace
+                  onLinkHover={(link: any) => {
+                    const tooltipEl = document.getElementById('link-tooltip');
+                    if (!tooltipEl) return;
+                    
+                    if (link) {
+                      const graphLink = link as GraphEdge;
+                      const source = typeof graphLink.source === 'object' ? graphLink.source : { x: 0, y: 0 };
+                      const target = typeof graphLink.target === 'object' ? graphLink.target : { x: 0, y: 0 };
+                      
+                      // Posición media del enlace
+                      const midX = ((source as NodeObject).x || 0 + (target as NodeObject).x || 0) / 2;
+                      const midY = ((source as NodeObject).y || 0 + (target as NodeObject).y || 0) / 2;
+                      
+                      const graphElem = graphRef.current?.containerElem;
+                      if (graphElem) {
+                        // Usar las coordenadas del grafo para posicionar el tooltip
+                        const pixelX = midX * graphElem.__zoom.k + graphElem.__zoom.x;
+                        const pixelY = midY * graphElem.__zoom.k + graphElem.__zoom.y;
+                        
+                        tooltipEl.innerHTML = `<div><strong>${graphLink.label || 'Relación'}</strong></div>`;
+                        
+                        tooltipEl.style.left = `${pixelX}px`;
+                        tooltipEl.style.top = `${pixelY - 10}px`;
+                        tooltipEl.style.display = 'block';
+                      }
+                    } else {
+                      tooltipEl.style.display = 'none';
+                    }
+                  }}
+                  linkWidth={(link: any) => (link as GraphEdge).width || 1.5}
+                  linkDirectionalParticles={2}
+                  linkDirectionalParticleWidth={2}
+                  linkCurvature={0.2}
+                  linkColor={(link: any) => (link as GraphEdge).color || '#b8c2cc'}
+                  onNodeClick={handleNodeClick}
+                  cooldownTicks={100}
+                  onEngineStop={() => graphRef.current?.zoomToFit(400, 50)}
+                  width={window.innerWidth}
+                  height={window.innerHeight - 60} // Dejar espacio para el navbar
+                  enableNodeDrag={true}
+                  enableZoomInteraction={true}
+                  enablePanInteraction={true}
+                />
+              </>
+            )}
+          </Tab.Pane>
+          <Tab.Pane eventKey="create">
+            <Container fluid>
+              {conceptMapCreated && (
+                <Alert variant="success" className="mb-3" dismissible onClose={() => setConceptMapCreated(false)}>
+                  Mapa conceptual creado y guardado exitosamente.
+                </Alert>
+              )}
+              
+              <Row className="mb-4">
+                <Col>
+                  <h3>Crear Nuevo Mapa Conceptual</h3>
+                  <p className="text-muted">
+                    Los mapas conceptuales te permiten visualizar las relaciones entre los conceptos principales de tus notas.
+                    Puedes crearlos a partir de texto directo o seleccionando notas existentes.
+                  </p>
+                </Col>
+              </Row>
+              
+              <Row className="mb-4">
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Texto para análisis (opcional)</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={5}
+                      value={conceptMapText}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setConceptMapText(e.target.value)}
+                      placeholder="Pega aquí el texto para generar un mapa conceptual..."
+                    />
+                  </Form.Group>
+                  
+                  <p className="text-muted">
+                    O bien, selecciona notas para incluir en el análisis utilizando la función de búsqueda de notas.
+                  </p>
+                  
+                  {/* Aquí iría un componente selector de notas que implementaremos en el futuro */}
+                  {/* Por ahora, mostramos un mensaje informativo */}
+                  <Alert variant="info">
+                    La selección de notas específicas estará disponible próximamente. Por ahora, utiliza el campo de texto para generar mapas conceptuales.
+                  </Alert>
+                </Col>
+              </Row>
+              
+              <ConceptMapCreator 
+                directText={conceptMapText} 
+                noteIds={selectedNoteIds} 
+                onMapCreated={handleMapCreated}
+              />
+            </Container>
+          </Tab.Pane>
+        </Tab.Content>
+      </Tab.Container>
+    </div>
+  );
+};
+
+export default GraphPage;

@@ -1,0 +1,210 @@
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { spawn } from 'child_process';
+
+// ES modules compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const isDev = process.env.NODE_ENV === 'development';
+
+let mainWindow;
+
+function createWindow() {
+    // Crear ventana principal
+    mainWindow = new BrowserWindow({
+        width: 1400,
+        height: 900,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload: path.join(__dirname, 'preload.js') // Para comunicación segura
+        },
+        icon: path.join(__dirname, '../assets/icon.png'),
+        show: false, // No mostrar hasta que esté listo
+        titleBarStyle: 'default'
+    });
+
+    // Cargar la aplicación React
+    const startUrl = isDev 
+        ? 'http://localhost:5174' 
+        : `file://${path.join(__dirname, '../dist/index.html')}`;
+    
+    mainWindow.loadURL(startUrl);
+
+    // Mostrar ventana cuando esté lista
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+        
+        // Abrir DevTools solo en desarrollo
+        if (isDev) {
+            mainWindow.webContents.openDevTools();
+        }
+    });
+
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+        // Backend es manejado externamente
+    });
+}
+
+// Iniciar el backend PyInstaller desde los recursos
+
+let backendProcess = null;
+
+// Función para iniciar el backend PyInstaller
+function startBackend() {
+    console.log('🚀 Iniciando backend PyInstaller...');
+    
+    // Determinar la ruta del ejecutable del backend según estemos en dev o prod
+    // Definimos múltiples posibles ubicaciones del backend en orden de prioridad
+    const possiblePaths = [
+        // 1. Ruta de distribución principal
+        path.join(process.cwd(), '../dist-apuntes/backend/ApuntesBackend.exe'),
+        // 2. Ruta relativa desde el directorio actual
+        path.join(process.cwd(), 'backend/ApuntesBackend.exe'),
+        // 3. Ruta legacy para compatibilidad
+        path.join(process.cwd(), '../backend/dist/ApuntesBackend/ApuntesBackend.exe'),
+        // 4. Ruta en recursos de la app empaquetada
+        path.join(process.resourcesPath, 'backend/ApuntesBackend.exe')
+    ];
+    
+    // Buscamos la primera ruta que exista
+    let backendPath = null;
+    const fs = require('fs');
+    
+    for (const testPath of possiblePaths) {
+        try {
+            if (fs.existsSync(testPath)) {
+                backendPath = testPath;
+                console.log(`✅ Backend encontrado en: ${backendPath}`);
+                break;
+            }
+        } catch (err) {
+            // Ignorar errores de acceso
+        }
+    }
+    
+    // Si no encontramos ninguna ruta válida, usar la primera como fallback
+    if (!backendPath) {
+        backendPath = possiblePaths[0];
+        console.log(`⚠️ No se encontró el backend, intentando con: ${backendPath}`);
+    }
+    
+    console.log(`📁 Ruta del backend: ${backendPath}`);
+    
+    try {
+        // Verificar que el archivo existe antes de intentar ejecutarlo
+        const fs = require('fs');
+        if (!fs.existsSync(backendPath)) {
+            console.error(`❌ El archivo de backend no existe en: ${backendPath}`);
+            return false;
+        }
+        
+        // Iniciar el proceso del backend
+        backendProcess = spawn(backendPath, [], {
+            windowsHide: false, // Mostramos ventana para depuración
+            stdio: 'pipe', // Capturamos salida para debugging
+            cwd: path.dirname(backendPath) // Establecer el directorio de trabajo al directorio donde está el ejecutable
+        });
+        
+        // Manejar salida del backend
+        backendProcess.stdout.on('data', (data) => {
+            console.log(`🔄 Backend: ${data.toString()}`);
+        });
+        
+        backendProcess.stderr.on('data', (data) => {
+            console.error(`⚠️ Backend Error: ${data.toString()}`);
+        });
+        
+        backendProcess.on('close', (code) => {
+            console.log(`⛔ Backend cerrado con código: ${code}`);
+            backendProcess = null;
+        });
+        
+        console.log('✅ Backend iniciado correctamente');
+        return true;
+    } catch (error) {
+        console.error('❌ Error al iniciar el backend:', error);
+        return false;
+    }
+}
+
+// Función para verificar si el backend ya está corriendo
+function checkBackend() {
+    return new Promise((resolve) => {
+        console.log('🔍 Verificando backend existente...');
+        
+        // Hacer una petición simple para verificar si el backend está activo
+        fetch('http://localhost:5000/api/health')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Backend ya está corriendo - usando backend externo');
+                    resolve(true);
+                } else {
+                    console.log('⚠️ Backend no responde - iniciando backend interno');
+                    const started = startBackend();
+                    // Esperamos 3 segundos para que el backend arranque
+                    setTimeout(() => resolve(started), 3000);
+                }
+            })
+            .catch(() => {
+                console.log('⚠️ Backend no disponible - iniciando backend interno');
+                const started = startBackend();
+                // Esperamos 3 segundos para que el backend arranque
+                setTimeout(() => resolve(started), 3000);
+            });
+    });
+}
+
+// Eventos de la aplicación
+app.whenReady().then(async () => {
+    console.log('🚀 Iniciando Apuntes 2.0...');
+    console.log('📁 Directorio actual:', process.cwd());
+    
+    const backendStatus = await checkBackend();
+    console.log(`🔌 Estado del backend: ${backendStatus ? 'Conectado' : 'Error'}`)
+    
+    // Solo crear ventana - el backend se maneja externamente
+    setTimeout(() => {
+        createWindow();
+    }, 2000); // Damos más tiempo para asegurar que el backend inicie correctamente
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
+
+app.on('window-all-closed', () => {
+    // Backend es manejado externamente
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('before-quit', () => {
+    // Cerrar el backend si está corriendo
+    if (backendProcess) {
+        console.log('🛑 Cerrando backend PyInstaller...');
+        try {
+            process.kill(backendProcess.pid);
+        } catch (error) {
+            console.error('Error al cerrar el backend:', error);
+        }
+    }
+    // Backend es manejado externamente
+});
+
+// IPC para comunicación con el renderer
+ipcMain.handle('get-backend-status', async () => {
+    try {
+        const response = await fetch('http://localhost:5000/api/health');
+        return response.ok ? 'running' : 'stopped';
+    } catch {
+        return 'stopped';
+    }
+});

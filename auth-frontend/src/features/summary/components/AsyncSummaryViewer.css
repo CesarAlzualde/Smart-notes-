@@ -1,0 +1,36 @@
+/**
+ * Estilos para el componente AsyncSummaryViewer
+ */
+
+.summary-content {
+  background-color: white;
+  font-size: 0.875rem;
+  padding: 0.75rem;
+}
+
+.summary-content.collapsed {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.summary-content.expanded {
+  max-height: none;
+}
+
+/* Estilos para la animación de carga */
+.animate-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+.progress-bar {
+  width: 50%;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,189 @@
+/* Estilos para componentes de autenticación */
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.auth-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.auth-header h1 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.auth-header p {
+  color: #666;
+}
+
+.register-form h2,
+.login-form h2 {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.form-group.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group.checkbox label {
+  margin-bottom: 0;
+}
+
+.form-group input[type="checkbox"] {
+  min-width: 18px;
+  height: 18px;
+}
+
+.input-error {
+  border-color: #e53935 !important;
+}
+
+.error {
+  color: #e53935;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.error-message {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: #e53935;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-message .close-btn {
+  background: none;
+  border: none;
+  color: #e53935;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.success-message {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+}
+
+.btn-primary {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #357ABD;
+}
+
+.btn-primary:disabled {
+  background-color: #9BB6D3;
+  cursor: not-allowed;
+}
+
+.links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.links a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
+.password-requirements {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.password-requirements p {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.1rem;
+}

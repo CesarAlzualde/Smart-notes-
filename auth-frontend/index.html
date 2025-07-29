@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+    <!-- No cargamos A-Frame directamente aquí para evitar problemas de orden de carga -->
+    <!-- El script aframe-loader.js se encargará de cargar A-Frame y nipple-controls en el orden correcto -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    
+    <!-- Scripts migrados desde Flask -->
+    <script src="/js/error-handler.js"></script>
+    <script src="/js/text-analysis.js"></script>
+    <script src="/js/ocr_handler.js"></script>
+    <script src="/js/notes_basic.js"></script>
+  </body>
+</html>
