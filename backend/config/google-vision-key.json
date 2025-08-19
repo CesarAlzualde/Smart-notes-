@@ -1,13 +1,1 @@
-{
-  "type": "service_account",
-  "project_id": "proyecto-apuntes-ocr",
-  "private_key_id": "849923331c60720d93e865b108181bdbe74eaf04",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDFWgjDljNbiV2G\nrEgrQntbAZxHiSAIKLro6JJm2k6EyADaBcFgTy6LHhMdmYBQvTCs7b9ZCLALI3g6\n1GJ2/lZ5kEuLS8rgKb9J3xCjn+FaNY62ILkPUK+IyM3GQ/p/7BFMh7qNhFX6aSG2\nTkfmc6rL17THh2ImKAFtvIXTNSOsTJHcPikLfVqciC+x8nwVE8N6FJV39EdmiPe4\nos2xy+WM78SHLnTVihzdQ+yatDZUNxdLHMdQ5noBVy4FiGsaocuYYLiEQWw3PiTl\nIGQStU6d3GqY2TUufga+tLxBHnwFb+POdKj3mzPKIzuobGATUk6idyPZJrumACR8\nJDrHd73tAgMBAAECggEABQLENjMaGrjiJwk4y+BkQWtJDIfuyEZAeKlvDi180OJD\nI0YCIu/fvqiE07uSBnrHQZzHvvr5fU7pPpUl6t+KUovXXzINdKOat8VyJrVog2HY\nvccW68ygqFhw4RfYxGa6CbdohS9W/4Sr1nUmXjORoptXe7l0RIO/hYnD3Bj9TuKX\nZFRhxFiTCRsMXVMswH0hsCojHzwM5Pc7JQZiIpDExt+dlS96VNqSBD0PgkH9vcSp\n35qofLhCiqg+pOcr8ww91viRhAirIG8PhpuAQJuHijHRxCSuKMHwen49hwF7NkOJ\nuxwlEzZWL4tUWM8K0qW3J/uGBwaxhN9iN5mYHK+gAQKBgQDrcroghYW9cJ0F/mnB\n3mnM8qhoOcHTi84g5KxHYMumV5H8OwTL0PiLJtC2YOFGPnWgUslZjkC2UeKQ+uIo\nHKlY0AdquZYhLlIidsy63E5bvM7xIzTeVphDffRXeOR2W+pWtYt5rYavWQ1HgAKn\nGuFLgPGD569/Jno9t1eDYDQJcQKBgQDWlAMYaUyh1g8+kSS3MDhlttWEaqHRPI6D\ntjCABD8eCGIFGOwyMpVvbzUYytLwHztdsrSlPZwIKN99evxIzfDtXYROUHynLEcX\ntnn9gOWx/5zddxyZsvWSki3t0jmuURk+iTzZPARNYhVa5+Q9ojRtVM1QyB/EkJ1t\nFDabXDpePQKBgQCCujyl+fz75h8JSO0ne3p7FPB0jj0UXDejA9Sz/QaV4WFpDsvm\n7qxRdsfDu57ZBa0By3WIh/deQ7DslqAjbWaJrVew5kJ5QeLQx+18gv3u6bJtKQMd\nwC7iqniUaMdRAE/ovPwoHzT8/xDkdisC5WXaKknu1yEWFCMjST0J8MxzwQKBgH3j\nTkGXHXdg74akfqbeqme6MWBDcvYfkfjh/WhNlX4YKvGUopX8qUE8PCl0bPalTB33\nhxXepFkBKcUjTzmjYPLRR5rui4NEbd0SmFVKtveL4Erp46SkooBANKPvDxoeyDGx\nMDq+hEOmBKNVoskqDZoLA32eO00GDuX80uCo5jF9AoGABpWvUgM5cpvoQIr1FwTv\nO8sFZ985Z4ZmJpYX35HAHgqekcrRjBVEfAmtJyUmlMyI46L62REFOezbUfi1B/UK\num3nuBkxmWIiXTXcHsF409LI8XWFVSstdHwFulxuRyYL6g2i+ERaWUhylPHD2WJ2\naPSNKlwGd94PS9TRF+HYu7c=\n-----END PRIVATE KEY-----\n",
-  "client_email": "cesaralzualde1@proyecto-apuntes-ocr.iam.gserviceaccount.com",
-  "client_id": "108609018598494807071",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cesaralzualde1%40proyecto-apuntes-ocr.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
+
